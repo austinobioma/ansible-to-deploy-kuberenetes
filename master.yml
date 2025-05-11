@@ -13,14 +13,22 @@
         shell: /bin/bash
         create_home: yes
 
+    - name: Ensure kube user's home directory exists
+      become: yes
+      file:
+        path: "/home/kube"
+        state: directory
+        owner: kube
+        group: kube
+        mode: '0755'
 
-    - name: create .kube directory
+    - name: Create .kube directory for kube user
       become: yes
       become_user: kube
       file:
-        path: $HOME/.kube
+        path: "/home/kube/.kube"
         state: directory
-        mode: 0755
+        mode: '0755'
 
     - name: copies admin.conf to user's kube config
       copy:
