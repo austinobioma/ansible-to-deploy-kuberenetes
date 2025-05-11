@@ -10,6 +10,16 @@
        dest: /tmp/kubernetes_join_command
        mode: 0777
 
+   - name: Reset kubeadm on workers
+     shell: kubeadm reset -f
+     become: yes
+
+   - name: Restart kubelet
+     systemd:
+       name: kubelet
+       state: restarted
+     become: yes
+
    - name: Join the Worker nodes to the cluster.
      become: yes
      command: sh /tmp/kubernetes_join_command
