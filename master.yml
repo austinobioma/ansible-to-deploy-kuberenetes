@@ -7,6 +7,13 @@
         chdir: $HOME
         creates: cluster_initialized.txt
 
+    - name: Ensure kube user exists
+      user:
+        name: kube
+        shell: /bin/bash
+        create_home: yes
+
+
     - name: create .kube directory
       become: yes
       become_user: kube
