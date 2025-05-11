@@ -5,23 +5,17 @@
     - name: create the kube user account
       user: name=kube append=yes state=present createhome=yes shell=/bin/bash
 
-    - name: allow 'kube' to use sudo without needing a password
+    - name: Allow 'ubuntu' to use sudo without needing a password
       lineinfile:
         dest: /etc/sudoers
-        line: 'kube ALL=(ALL) NOPASSWD: ALL'
+        line: 'ubuntu ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
 
-    - name: Create .ssh directory for kube user
-      file:
-        path: /home/kube/.ssh
-        state: directory
-        owner: kube
-        group: kube
-        mode: '0700'
 
-    - name: Set up authorized key for the kube user
+    - name: Set up authorized key for ubuntu user
       authorized_key:
-        user: kube
+        user: ubuntu
         state: present
         key: "{{ lookup('file', '/home/ubuntu/.ssh/id_rsa.pub') }}"
+
 
