@@ -24,7 +24,6 @@
 
     - name: Create .kube directory for kube user
       become: yes
-      become_user: kube
       file:
         path: "/home/kube/.kube"
         state: directory
