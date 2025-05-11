@@ -31,7 +31,7 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook install-k8s.yml
-          ansible-playbook master.yml
-          ansible-playbook join-workers.yml
-          ansible-playbook users.yml
+          ansible-playbook -i hosts install-k8s.yml
+          ansible-playbook -i hosts master.yml
+          ansible-playbook -i hosts join-workers.yml
+          ansible-playbook -i hosts users.yml
