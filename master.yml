@@ -102,20 +102,9 @@
       until: kubeapi_health_after_reinit.status == 200
       become: yes
 
-    - name: Wait for kube-kubelete to be ready
-      uri:
-        url: http://localhost:8080/healthz
-        method: GET
-        status_code: 200
-      register: result
-      until: result.status == 200
-      retries: 20
-      delay: 5
-
-
     - name: Install Calico network plugin
       become: yes
-      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml --validate=false
+      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml --kubeconfig=/etc/kubernetes/admin.conf --validate=false
       register: calico_apply
       retries: 5
       delay: 10
