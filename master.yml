@@ -38,14 +38,12 @@
 
     - name: install Pod network
       become: yes
-      become_user: kube
       shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
       args:
         chdir: $HOME
         
     - name: Get the token for joining the worker nodes
       become: yes
-      become_user: kube
       shell: kubeadm token create  --print-join-command
       register: kubernetes_join_command
 
