@@ -54,24 +54,24 @@
                sudo swapoff -a
                sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
-     - name: install and configure dependencies
-       shell: |
-               sudo apt-get update && sudo apt-get install -y apt-transport-https curl
-               curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+     - name: Add Kubernetes GPG key
+       ansible.builtin.apt_key:
+         url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
+         keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+         state: present
 
-     - name: Create kubernetes repo file
-       file:
-         path: "/etc/apt/sources.list.d/kubernetes.list"
-         state: "touch"
+     - name: Add Kubernetes APT repository
+       ansible.builtin.apt_repository:
+         repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /"
+         filename: "kubernetes"
+         state: present
 
-     - name: Add K8s Source
-       blockinfile:
-         path: "/etc/apt/sources.list.d/kubernetes.list"
-         block: |
-               deb https://apt.kubernetes.io/ kubernetes-xenial main
+     - name: Install Kubernetes packages
+       apt:
+         name:
+           - kubelet
+           - kubeadm
+           - kubectl
+         state: present
+         update_cache: yes
 
-     - name: install kubernetes
-       shell: |
-               sudo apt-get update
-               sudo apt-get install -y kubelet=1.20.1-00 kubeadm=1.20.1-00 kubectl=1.20.1-00
-               sudo apt-mark hold kubelet kubeadm kubectl

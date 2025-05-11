@@ -1,0 +1,37 @@
+name: Run Ansible Playbook
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set UP SSH Connection between ansible and Remote Hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ANSIBLE_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          echo "${{ secrets.ANSIBLE_HOSTS }}" | while read ip; do
+            ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts 2>/dev/null
+          done
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook install-k8s.yml
+          ansible-playbook master.yml
+          ansible-playbook join-workers.yml
+          ansible-playbook users.yml
