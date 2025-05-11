@@ -11,7 +11,17 @@
         line: 'kube ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
 
-    - name: set up authorized keys for the kube user
-      authorized_key: user=kube key="{{item}}"
-      with_file:
-        - ~/.ssh/id_rsa.pub
+    - name: Create .ssh directory for kube user
+      file:
+        path: /home/kube/.ssh
+        state: directory
+        owner: kube
+        group: kube
+        mode: '0700'
+
+    - name: Set up authorized key for the kube user
+      authorized_key:
+        user: kube
+        state: present
+        key: "{{ lookup('file', '/home/ubuntu/.ssh/id_rsa.pub') }}"
+
