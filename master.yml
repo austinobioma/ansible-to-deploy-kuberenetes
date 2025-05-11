@@ -82,7 +82,26 @@
       retries: 10
       delay: 15
       until: kubeapi_health.status == 200
+      ignore_errors: yes
       become: yes
+
+    - name: Reinitialize Kubernetes cluster if API is not up
+      shell: kubeadm reset -f && kubeadm init --pod-network-cidr=172.31.0.0/16 --ignore-preflight-errors=all
+      when: kubeapi_health.status != 200
+      become: yes
+
+    - name: Wait for Kubernetes API again after reinit
+      uri:
+        url: https://localhost:6443/healthz
+        method: GET
+        status_code: 200
+        validate_certs: no
+      register: kubeapi_health_after_reinit
+      retries: 10
+      delay: 15
+      until: kubeapi_health_after_reinit.status == 200
+      become: yes
+
 
     - name: Install Calico network plugin
       become: yes
