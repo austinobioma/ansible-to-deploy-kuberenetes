@@ -29,6 +29,23 @@
         state: directory
         mode: '0755'
 
+    - name: Check if kubelet is running
+      systemd:
+        name: kubelet
+        state: started
+      become: yes
+      tags:
+        - kubelet
+
+    - name: Ensure kubelet is started and enabled
+      systemd:
+        name: kubelet
+        state: started
+        enabled: yes
+      become: yes
+      tags:
+        - kubelet
+
     - name: copies admin.conf to user's kube config
       copy:
         src: /etc/kubernetes/admin.conf
@@ -36,11 +53,24 @@
         remote_src: yes
         owner: kube
 
-    - name: install Pod network
+    - name: Copy kubeconfig to user home directory
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: "/home/ubuntu/.kube/config"
+        remote_src: yes
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
       become: yes
-      shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml 
-      args:
-        chdir: $HOME
+      tags:
+        - kubeconfig
+
+    - name: Install Calico network plugin
+      command:
+        cmd: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+      become_user: ubuntu
+      tags:
+          - calico
         
     - name: Get the token for joining the worker nodes
       become: yes
