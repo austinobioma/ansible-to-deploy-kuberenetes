@@ -30,11 +30,11 @@
         mode: '0755'
 
     - name: Create .kube directory for ubuntu user
-        become: yes
-        file:
-          path: "/home/ubuntu/.kube"
-          state: directory
-          mode: '0755'
+      become: yes
+      file:
+        path: "/home/ubuntu/.kube"
+        state: directory
+        mode: '0755'
 
     - name: Check if kubelet is running
       systemd:
